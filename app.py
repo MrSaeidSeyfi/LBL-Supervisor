@@ -3,7 +3,7 @@ from app.state import state
 from app.handlers import (
     process_image, select_box, create_label,
     delete_selected, update_selected_class, 
-    update_box_coordinates
+    update_box_coordinates, move_box
 )
 
 with gr.Blocks() as app:
@@ -15,7 +15,7 @@ with gr.Blocks() as app:
             run_button = gr.Button("Run Detection")
         
         with gr.Column():
-            output_image = gr.Image(label="Detection Results (Click to select boxes)")
+            output_image = gr.Image(label="Detection Results (Click to select boxes, use arrow keys to move)")
             
             with gr.Row():
                 delete_btn = gr.Button("Delete Selected Box")
@@ -30,6 +30,12 @@ with gr.Blocks() as app:
                 x2_input = gr.Number(label="X2", precision=0)
                 y2_input = gr.Number(label="Y2", precision=0)
                 update_coords_btn = gr.Button("Update Coordinates")
+            
+            with gr.Row():
+                up_btn = gr.Button("↑")
+                down_btn = gr.Button("↓")
+                left_btn = gr.Button("←")
+                right_btn = gr.Button("→")
             
             boxes_output = gr.JSON(label="Bounding Boxes")
             labels_output = gr.JSON(label="Labels")
@@ -71,6 +77,31 @@ with gr.Blocks() as app:
         fn=update_box_coordinates,
         inputs=[x1_input, y1_input, x2_input, y2_input],
         outputs=[output_image, boxes_output, labels_output, conf_output]
+    )
+
+    # Handle arrow button clicks
+    up_btn.click(
+        fn=lambda img: move_box(img, "up"),
+        inputs=[output_image],
+        outputs=[output_image, boxes_output, labels_output, conf_output, x1_input, y1_input, x2_input, y2_input]
+    )
+    
+    down_btn.click(
+        fn=lambda img: move_box(img, "down"),
+        inputs=[output_image],
+        outputs=[output_image, boxes_output, labels_output, conf_output, x1_input, y1_input, x2_input, y2_input]
+    )
+    
+    left_btn.click(
+        fn=lambda img: move_box(img, "left"),
+        inputs=[output_image],
+        outputs=[output_image, boxes_output, labels_output, conf_output, x1_input, y1_input, x2_input, y2_input]
+    )
+    
+    right_btn.click(
+        fn=lambda img: move_box(img, "right"),
+        inputs=[output_image],
+        outputs=[output_image, boxes_output, labels_output, conf_output, x1_input, y1_input, x2_input, y2_input]
     )
 
 if __name__ == "__main__":
